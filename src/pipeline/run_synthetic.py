@@ -1,0 +1,70 @@
+"""Main pipeline for synthetic experiments."""
+
+import argparse
+from pathlib import Path
+
+from ..common.config import load_config, get_output_dir, save_config
+from ..common.logging import setup_logging
+from ..common.rng import set_seed
+from ..common.io import save_jsonl
+from ..modeling.llm import LLMManager
+from ..modeling.run import GenerationRunner
+from ..tasks.synthetic.runner import SyntheticRunner
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Run synthetic survival experiment")
+    parser.add_argument(
+        "--config",
+        type=str,
+        required=True,
+        help="Path to configuration file"
+    )
+    parser.add_argument(
+        "--overrides",
+        nargs="*",
+        default=[],
+        help="Configuration overrides in dotlist format"
+    )
+    args = parser.parse_args()
+
+    config = load_config(args.config, args.overrides)
+
+    output_dir = get_output_dir(config)
+    logger = setup_logging(
+        log_file=str(output_dir / "experiment.log"),
+        level=config.get("logging", {}).get("level", "INFO")
+    )
+
+    set_seed(config["seed"])
+
+    logger.info(f"Starting synthetic experiment: {config.experiment_name}")
+    logger.info(f"Output directory: {output_dir}")
+
+    save_config(config, str(output_dir / "config.yaml"))
+
+    llm_manager = LLMManager(
+        model_name=config.model.name,
+        **config.model.get("model_kwargs", {})
+    )
+    generation_runner = GenerationRunner(llm_manager)
+
+    logger.info(f"Loaded model: {config.model.name}")
+
+    synthetic_runner = SyntheticRunner(
+        generation_runner=generation_runner,
+        config=config,
+        logger=logger
+    )
+
+    results = synthetic_runner.run_experiment()
+
+    raw_output_file = output_dir / "raw" / "results.jsonl"
+    save_jsonl(results, raw_output_file)
+
+    logger.info(f"Saved {len(results)} records to {raw_output_file}")
+    logger.info("Experiment completed successfully")
+
+
+if __name__ == "__main__":
+    main()

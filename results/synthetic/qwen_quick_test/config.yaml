@@ -1,0 +1,17 @@
+experiment_name: qwen_quick_test
+seed: 42
+model:
+  name: Qwen/Qwen2.5-Math-1.5B
+  max_new_tokens: 1024
+  temperature: 0.0
+  model_kwargs:
+    device_map: mps
+data:
+  generator: arith
+  n_instances: 2
+  max_depth: 4
+  condition: terse
+  initial_value: 1
+logging:
+  out_dir: results/synthetic
+  level: INFO

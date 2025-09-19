@@ -1,0 +1,20 @@
+# Global configuration settings
+seed: 42
+device: "auto"
+
+logging:
+  level: "INFO"
+  out_dir: "results"
+
+# Model defaults
+model_defaults:
+  torch_dtype: "float16"
+  device_map: "auto"
+  model_kwargs: {}
+
+# Analysis defaults
+analysis_defaults:
+  survival:
+    time_axes: ["step", "tokens_total"]
+    curves: ["km"]
+    confidence_intervals: true

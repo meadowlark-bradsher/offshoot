@@ -1,0 +1,24 @@
+# Small test with Qwen Math model
+experiment_name: "synthetic_qwen_small"
+seed: 42
+
+model:
+  name: "Qwen/Qwen2.5-Math-1.5B"
+  max_new_tokens: 256
+  temperature: 0.0
+
+data:
+  generator: "arith"
+  n_instances: 5
+  max_depth: 10
+  condition: "terse"
+  initial_value: 1
+
+logging:
+  out_dir: "results/synthetic"
+  level: "INFO"
+
+analysis:
+  survival:
+    time_axes: ["step", "tokens_total"]
+    curves: ["km"]

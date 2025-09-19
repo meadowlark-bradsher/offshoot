@@ -1,0 +1,21 @@
+# Quick data generation test with math model for immediate results
+experiment_name: "data_generation_test"
+seed: 42
+
+model:
+  name: "Qwen/Qwen2.5-Math-1.5B"  # Use the fast math model for quick data
+  max_new_tokens: 1024
+  temperature: 0.0
+  model_kwargs:
+    device_map: "mps"
+
+data:
+  generator: "arith"
+  n_instances: 10       # Small but meaningful sample
+  max_depth: 30         # High ceiling, but expects natural stopping
+  condition: "terse"
+  initial_value: 1
+
+logging:
+  out_dir: "results/synthetic"
+  level: "INFO"

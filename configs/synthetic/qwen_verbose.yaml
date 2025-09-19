@@ -1,0 +1,26 @@
+# Qwen verbose condition - high token limit for full reasoning
+experiment_name: "qwen_verbose_L15"
+seed: 42
+
+model:
+  name: "Qwen/Qwen2.5-Math-1.5B"
+  max_new_tokens: 1024  # Much higher limit
+  temperature: 0.0
+  model_kwargs:
+    device_map: "mps"
+
+data:
+  generator: "arith"
+  n_instances: 20       # Same as terse for comparison
+  max_depth: 15         # Same depth
+  condition: "verbose"
+  initial_value: 1
+
+logging:
+  out_dir: "results/synthetic"
+  level: "INFO"
+
+analysis:
+  survival:
+    time_axes: ["step", "tokens_total"]
+    curves: ["km"]

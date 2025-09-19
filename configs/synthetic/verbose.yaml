@@ -1,0 +1,24 @@
+# Synthetic experiment: Verbose condition
+experiment_name: "synthetic_verbose_L30"
+seed: 123
+
+model:
+  name: "gpt2"
+  max_new_tokens: 256
+  temperature: 0.0
+
+data:
+  generator: "arith"
+  n_instances: 100
+  max_depth: 30
+  condition: "verbose"
+  initial_value: 1
+
+logging:
+  out_dir: "results/synthetic"
+  level: "INFO"
+
+analysis:
+  survival:
+    time_axes: ["step", "tokens_total"]
+    curves: ["km"]

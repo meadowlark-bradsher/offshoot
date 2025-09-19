@@ -1,0 +1,26 @@
+# Qwen2.5-3B generalist model - Deep terse experiment
+experiment_name: "qwen3b_terse_deep"
+seed: 42
+
+model:
+  name: "Qwen/Qwen2.5-3B-Instruct"
+  max_new_tokens: 2048  # High limit for deep chains
+  temperature: 0.0
+  model_kwargs:
+    device_map: "mps"
+
+data:
+  generator: "arith"
+  n_instances: 15       # Moderate size for deep experiments
+  max_depth: 25         # Deep enough to find failures
+  condition: "terse"
+  initial_value: 1
+
+logging:
+  out_dir: "results/synthetic"
+  level: "INFO"
+
+analysis:
+  survival:
+    time_axes: ["step", "tokens_total"]
+    curves: ["km"]

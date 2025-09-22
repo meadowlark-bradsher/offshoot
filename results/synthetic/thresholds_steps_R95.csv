@@ -1,0 +1,4 @@
+model,condition,R,t_star_km,t_star_km_ci,t_star_weibull,chosen_t_star,method_used
+qwen2.5-3b,redundant,0.95,0,0,,0,km_ci
+qwen2.5-3b,terse,0.95,6,0,,0,km_ci
+qwen2.5-3b,verbose,0.95,7,0,,0,km_ci

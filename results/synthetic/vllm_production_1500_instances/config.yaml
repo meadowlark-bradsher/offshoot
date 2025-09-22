@@ -1,0 +1,27 @@
+experiment_name: vllm_production_1500_instances
+seed: 12345
+model:
+  name: Qwen/Qwen2.5-3B-Instruct
+  backend: vllm
+  max_new_tokens: 300
+  temperature: 0.0
+  vllm:
+    tensor_parallel_size: 1
+    max_model_len: 2048
+    gpu_memory_utilization: 0.6
+data:
+  generator: arith
+  condition: terse
+  n_instances: 3
+  max_depth: 30
+  initial_value: 1
+logging:
+  out_dir: results/synthetic
+  level: INFO
+analysis:
+  survival:
+    time_axes:
+    - step
+    - tokens_total
+    curves:
+    - km

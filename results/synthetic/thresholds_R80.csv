@@ -1,0 +1,4 @@
+model,condition,reliability,chosen_threshold
+qwen2.5-3b,redundant,0.8,0
+qwen2.5-3b,terse,0.8,3
+qwen2.5-3b,verbose,0.8,3

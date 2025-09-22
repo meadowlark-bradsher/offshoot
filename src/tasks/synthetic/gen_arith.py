@@ -14,16 +14,23 @@ def generate_chain_task(
     Generate arithmetic chain task prompt.
 
     Based on the reference notebook pattern but with condition variations.
+    Now uses RNG for randomized operation generation.
     """
     operations = []
 
     for i in range(1, depth + 1):
-        if i % 3 == 1:
-            operations.append(f"add {i}")
-        elif i % 3 == 2:
-            operations.append(f"multiply by {i + 1}")
-        else:
-            operations.append(f"subtract {i - 1}")
+        # Randomize operation type and operand
+        op_type = rng.choice(["add", "subtract", "multiply"])
+
+        if op_type == "add":
+            operand = rng.randint(1, 20)
+            operations.append(f"add {operand}")
+        elif op_type == "subtract":
+            operand = rng.randint(1, 20)
+            operations.append(f"subtract {operand}")
+        else:  # multiply
+            operand = rng.randint(2, 12)
+            operations.append(f"multiply by {operand}")
 
     if condition == "terse":
         task = (
@@ -67,19 +74,20 @@ def generate_chain_task(
     else:
         raise ValueError(f"Unknown condition: {condition}")
 
-    return prompt
+    return prompt, operations
 
 
-def calculate_chain_answer(initial_value: int, depth: int) -> int:
+def calculate_chain_answer(initial_value: int, operations: list) -> int:
     """Calculate the expected result of the arithmetic chain."""
     result = initial_value
-    for i in range(1, depth + 1):
-        if i % 3 == 1:
-            result += i
-        elif i % 3 == 2:
-            result *= (i + 1)
-        else:
-            result -= (i - 1)
+    for operation in operations:
+        parts = operation.split()
+        if parts[0] == "add":
+            result += int(parts[1])
+        elif parts[0] == "subtract":
+            result -= int(parts[1])
+        elif parts[0] == "multiply" and parts[1] == "by":
+            result *= int(parts[2])
     return result
 
 
@@ -96,8 +104,8 @@ def generate_chain_instance(
     Returns:
         (prompt, expected_answer, metadata)
     """
-    prompt = generate_chain_task(initial_value, depth, condition, rng)
-    expected = calculate_chain_answer(initial_value, depth)
+    prompt, operations = generate_chain_task(initial_value, depth, condition, rng)
+    expected = calculate_chain_answer(initial_value, operations)
 
     metadata = {
         "initial_value": initial_value,

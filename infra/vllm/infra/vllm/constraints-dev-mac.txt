@@ -1,0 +1,7 @@
+# macOS dev (CPU only)—keep vLLM happy
+numpy<2.0
+torch==2.4.0
+transformers>=4.41,<5
+pydantic<3
+fastapi
+uvicorn

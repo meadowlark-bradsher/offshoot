@@ -25,9 +25,12 @@ class SyntheticRunner:
         self.config = config
         self.logger = logger or setup_logging()
 
-    def run_experiment(self) -> List[Dict[str, Any]]:
+    def run_experiment(self, output_file=None) -> List[Dict[str, Any]]:
         """
         Run synthetic survival experiment.
+
+        Args:
+            output_file: Optional path to write results incrementally
 
         Returns list of experimental records in the common schema.
         """
@@ -47,6 +50,7 @@ class SyntheticRunner:
         for run_idx in tqdm(range(n_instances), desc="Instances"):
             rng = SeededRNG(self.config["seed"] + run_idx)
             instance_id = str(uuid.uuid4())[:8]
+            instance_results = []
 
             for depth in range(1, max_depth + 1):
                 prompt, expected, metadata = generate_chain_instance(
@@ -92,6 +96,7 @@ class SyntheticRunner:
                         "value_present": scores["value_present"],
                     }
 
+                    instance_results.append(record)
                     results.append(record)
 
                     # Only break on incorrect answers, not token limits
@@ -102,5 +107,24 @@ class SyntheticRunner:
                     self.logger.error(f"Error processing depth {depth}: {e}")
                     break
 
+            # Write instance results immediately if output file provided
+            if output_file and instance_results:
+                self._append_results_to_file(instance_results, output_file)
+                self.logger.info(f"Instance {run_idx + 1}/{n_instances} completed: {len(instance_results)} steps, final depth: {instance_results[-1]['depth_step']}")
+
         self.logger.info(f"Completed experiment with {len(results)} records")
         return results
+
+    def _append_results_to_file(self, records: List[Dict[str, Any]], output_file: str):
+        """Append records to JSONL file for incremental progress tracking."""
+        import json
+        from pathlib import Path
+
+        # Ensure directory exists
+        Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+
+        # Append records to file
+        with open(output_file, 'a', encoding='utf-8') as f:
+            for record in records:
+                f.write(json.dumps(record) + '\n')
+            f.flush()  # Ensure immediate write to disk

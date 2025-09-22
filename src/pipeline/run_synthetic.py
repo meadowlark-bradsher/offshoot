@@ -57,10 +57,17 @@ def main():
         logger=logger
     )
 
-    results = synthetic_runner.run_experiment()
-
+    # Set up incremental output file
     raw_output_file = output_dir / "raw" / "results.jsonl"
-    save_jsonl(results, raw_output_file)
+    raw_output_file.parent.mkdir(parents=True, exist_ok=True)
+
+    # Clear existing file if it exists
+    if raw_output_file.exists():
+        raw_output_file.unlink()
+
+    logger.info(f"Results will be written incrementally to: {raw_output_file}")
+
+    results = synthetic_runner.run_experiment(output_file=str(raw_output_file))
 
     logger.info(f"Saved {len(results)} records to {raw_output_file}")
     logger.info("Experiment completed successfully")

@@ -1,0 +1,31 @@
+# Production vLLM experiment - optimized for large-scale data collection
+experiment_name: "vllm_production_1500_instances"
+seed: 12345
+
+model:
+  name: "Qwen/Qwen2.5-3B-Instruct"
+  backend: "vllm"
+  max_new_tokens: 300
+  temperature: 0.0
+
+  # Production vLLM settings - optimized for batch processing
+  vllm:
+    tensor_parallel_size: 1
+    max_model_len: 2048
+    gpu_memory_utilization: 0.6  # Stable memory usage
+
+data:
+  generator: "arith"
+  condition: "terse"  # Focus on terse - best performance in survival analysis
+  n_instances: 1500   # Full target sample size
+  max_depth: 30       # Allow deeper chains for survival analysis
+  initial_value: 1
+
+logging:
+  out_dir: "results/synthetic"
+  level: "INFO"
+
+analysis:
+  survival:
+    time_axes: ["step", "tokens_total"]
+    curves: ["km"]
